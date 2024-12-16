@@ -8,6 +8,7 @@ public class FinanceSpringbootAppApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FinanceSpringbootAppApplication.class, args);
+		System.out.println("Aplicacion arrancada");
 	}
 
 }
