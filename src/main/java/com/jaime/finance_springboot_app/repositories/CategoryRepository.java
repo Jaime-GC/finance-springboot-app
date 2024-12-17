@@ -7,4 +7,5 @@ import com.jaime.finance_springboot_app.models.Category;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
+    Category findByName(String name);
 }

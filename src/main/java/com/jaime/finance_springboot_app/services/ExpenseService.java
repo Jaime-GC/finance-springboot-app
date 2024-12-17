@@ -1,6 +1,7 @@
 package com.jaime.finance_springboot_app.services;
 
 import java.util.List;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,13 @@ public class ExpenseService {
 
     public void deleteExpense(Long id) {
         expenseRepository.deleteById(id);
+    }
+
+    public List<Expense> getExpensesByCategory(String category) {
+        return expenseRepository.findByCategory(category);
+    }
+
+    public List<Expense> getExpensesByDate(Date date) {
+        return expenseRepository.findByDate(date);
     }
 }

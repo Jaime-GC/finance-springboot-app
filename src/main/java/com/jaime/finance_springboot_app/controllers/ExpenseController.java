@@ -1,5 +1,6 @@
 package com.jaime.finance_springboot_app.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jaime.finance_springboot_app.models.Category;
 import com.jaime.finance_springboot_app.models.Expense;
 import com.jaime.finance_springboot_app.models.User;
+import com.jaime.finance_springboot_app.services.CategoryService;
 import com.jaime.finance_springboot_app.services.ExpenseService;
 import com.jaime.finance_springboot_app.services.UserService;
 
@@ -26,6 +29,9 @@ public class ExpenseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping("/all")
     public List<Expense> getAllExpenses() {
@@ -42,17 +48,17 @@ public class ExpenseController {
         return expenseService.getExpenseById(id);
     }
 
-    @PostMapping("/create/{userId}")
-    public Expense createExpense(@PathVariable Long userId, @RequestBody Expense expense) {
-        //busca si existe el user con ese id y lo guarda en el gasto
+    @PostMapping("/create/{userId}/{categoryName}")
+    public Expense createExpense(@PathVariable Long userId, @PathVariable String categoryName, @RequestBody Expense expense) {
         User userById = userService.getUserById(userId);
-        if(userById == null) {
+        Category categoryByName = categoryService.getCategoryByName(categoryName);
+        if (userById == null || categoryByName == null) {
             return null;
         } else {
             expense.setUser(userById);
+            expense.setCategory(categoryByName);
             return expenseService.createExpense(expense);
         }
-        
     }
 
     @PutMapping("/update/{id}")
@@ -63,5 +69,15 @@ public class ExpenseController {
     @DeleteMapping("delete/{id}")
     public void deleteExpense(@PathVariable Long id) {
         expenseService.deleteExpense(id);
+    }
+
+    @GetMapping("/category/{category}")
+    public List<Expense> getExpensesByCategory(@PathVariable String category) {
+        return expenseService.getExpensesByCategory(category);
+    }
+
+    @GetMapping("/date/{date}")
+    public List<Expense> getExpensesByDate(@PathVariable Date date) {
+        return expenseService.getExpensesByDate(date);
     }
 }

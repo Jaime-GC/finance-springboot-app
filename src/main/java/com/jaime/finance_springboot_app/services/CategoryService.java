@@ -22,13 +22,17 @@ public class CategoryService {
         return categoryRepository.findById(id).orElse(null);
     }
 
+    public Category getCategoryByName(String name) {
+        return categoryRepository.findByName(name);
+    }
+
     public Category createCategory(Category category) {
         return categoryRepository.save(category);
     }
 
-    public Category updateCategory(Long id, Category categoryDetails) {
+    public Category updateCategory(Long id, Category updatedCategory) {
         return categoryRepository.findById(id).map(category -> {
-            category.setName(categoryDetails.getName());
+            category.setName(updatedCategory.getName());
             return categoryRepository.save(category);
         }).orElse(null);
     }

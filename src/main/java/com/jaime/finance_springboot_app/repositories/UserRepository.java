@@ -13,6 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "ALTER SEQUENCE users_id_seq RESTART WITH 1", nativeQuery = true)
+    @Query(value = "ALTER SEQUENCE users_id_seq RESTART WITH 1", nativeQuery = true) 
     void resetAutoIncrement();
+
+    //⬆️ Todo esto nos permite resetear el autoincremental de la tabla users
 }

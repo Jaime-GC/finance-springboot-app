@@ -1,5 +1,6 @@
 package com.jaime.finance_springboot_app.repositories;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,6 @@ import com.jaime.finance_springboot_app.models.Expense;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByUserId(Long userId);
+    List<Expense> findByCategory(String category);
+    List<Expense> findByDate(Date date);
 }
