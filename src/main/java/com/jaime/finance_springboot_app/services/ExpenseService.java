@@ -1,22 +1,29 @@
 package com.jaime.finance_springboot_app.services;
 
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jaime.finance_springboot_app.models.Category;
 import com.jaime.finance_springboot_app.models.Expense;
 import com.jaime.finance_springboot_app.repositories.ExpenseRepository;
 
 @Service
 public class ExpenseService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExpenseService.class);
+
     @Autowired
     private ExpenseRepository expenseRepository;
 
     public List<Expense> getAllExpenses() { // sirve para obtener todos los gastos
-        return expenseRepository.findAll();
+        List<Expense> expenses = expenseRepository.findAll();
+        logger.debug("Fetched expenses: {}", expenses);
+        return expenses;
     }
 
     public List<Expense> getExpensesByUserId(Long userId) { // sirve para obtener todos los gastos de un usuario
@@ -36,6 +43,8 @@ public class ExpenseService {
             expense.setDescription(updatedExpense.getDescription());
             expense.setAmount(updatedExpense.getAmount());
             expense.setDate(updatedExpense.getDate());
+            expense.setUser(updatedExpense.getUser());
+            expense.setCategory(updatedExpense.getCategory());
             return expenseRepository.save(expense);
         }).orElse(null);
     }
@@ -44,7 +53,7 @@ public class ExpenseService {
         expenseRepository.deleteById(id);
     }
 
-    public List<Expense> getExpensesByCategory(String category) {
+    public List<Expense> getExpensesByCategory(Category category) {
         return expenseRepository.findByCategory(category);
     }
 

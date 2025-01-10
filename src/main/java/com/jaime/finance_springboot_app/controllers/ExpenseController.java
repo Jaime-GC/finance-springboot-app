@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,15 +51,16 @@ public class ExpenseController {
     }
 
     @PostMapping("/create/{userId}/{categoryName}")
-    public Expense createExpense(@PathVariable Long userId, @PathVariable String categoryName, @RequestBody Expense expense) {
+    public ResponseEntity<Expense> createExpense(@PathVariable Long userId, @PathVariable String categoryName, @RequestBody Expense expense) {
         User userById = userService.getUserById(userId);
         Category categoryByName = categoryService.getCategoryByName(categoryName);
         if (userById == null || categoryByName == null) {
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } else {
             expense.setUser(userById);
             expense.setCategory(categoryByName);
-            return expenseService.createExpense(expense);
+            Expense createdExpense = expenseService.createExpense(expense);
+            return  ResponseEntity.ok(createdExpense);
         }
     }
 
@@ -72,7 +75,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/category/{category}")
-    public List<Expense> getExpensesByCategory(@PathVariable String category) {
+    public List<Expense> getExpensesByCategory(@PathVariable Category category) {
         return expenseService.getExpensesByCategory(category);
     }
 

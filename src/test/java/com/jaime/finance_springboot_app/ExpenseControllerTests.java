@@ -1,29 +1,25 @@
 package com.jaime.finance_springboot_app;
 
-import static org.mockito.Mockito.when;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.hasSize;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 import com.jaime.finance_springboot_app.controllers.ExpenseController;
 import com.jaime.finance_springboot_app.models.Category;
@@ -39,39 +35,38 @@ public class ExpenseControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private ExpenseService expenseService;
 
-    @Mock
+    @MockBean
     private UserService userService;
 
-    @Mock
+    @MockBean
     private CategoryService categoryService;
 
-    @InjectMocks
-    private ExpenseController expenseController;
-
-    private Expense expense1;
-    private Expense expense2;
-    private User user;
-    private Category category;
+    private List<Expense> expenseList;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        User user = new User(1L, "John Doe", "john@example.com");
+        Category category = new Category(1L, "Groceries");
+        
+        Expense expense1 = new Expense(1L, "Grocery shopping", 100, LocalDate.of(2023, 06, 30), user, category);
+        Expense expense2 = new Expense(2L, "Electricity bill", 50, LocalDate.now(), user, category);
+        expenseList = Arrays.asList(expense1, expense2);
 
-        user = new User(1L, "John Doe", "john.doe@example.com");
-        category = new Category(1L, "Groceries");
+        Mockito.when(expenseService.getAllExpenses()).thenReturn(expenseList);
+        Mockito.when(expenseService.getExpenseById(1L)).thenReturn(expense1);
 
-        expense1 = new Expense(1L, "Grocery shopping", 100, LocalDate.of(2023, 6, 30), user, category);
-        expense2 = new Expense(2L, "Electricity bill", 50, LocalDate.of(2023, 6, 30), user, category);
+        //Mock para userService y categoryService
+        Mockito.when(userService.getUserById(1L)).thenReturn(user);
+        Mockito.when(categoryService.getCategoryByName("Groceries")).thenReturn(category);
 
-        when(expenseService.getAllExpenses()).thenReturn(Arrays.asList(expense1, expense2));
-        when(expenseService.getExpenseById(1L)).thenReturn(expense1);
-        when(expenseService.createExpense(expense1)).thenReturn(expense1);
-        when(expenseService.updateExpense(1L, expense1)).thenReturn(expense1);
-        when(userService.getUserById(1L)).thenReturn(user);
-        when(categoryService.getCategoryByName("Groceries")).thenReturn(category);
+
+        Mockito.when(expenseService.createExpense(Mockito.any(Expense.class))).thenReturn(expense1);
+        
+        Expense updatedExpense = new Expense(1L, "Updated Grocery shopping", 150, LocalDate.of(2023, 7, 1), user, category);
+        Mockito.when(expenseService.updateExpense(Mockito.eq(1L), Mockito.any(Expense.class))).thenReturn(updatedExpense);
     }
 
     @Test
@@ -92,24 +87,26 @@ public class ExpenseControllerTests {
 
     @Test
     public void testCreateExpense() throws Exception {
-        String newExpenseJson = "{\"description\": \"Grocery shopping\", \"amount\": \"100.00\", \"date\": \"2023-06-30\"}";
+        String newExpenseJson = "{\"description\": \"Grocery shopping\", \"amount\": \"100\", \"date\": \"2023-06-30\"}";
 
         mockMvc.perform(post("/expenses/create/1/Groceries")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(newExpenseJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is("Grocery shopping")));
+                .andExpect(jsonPath("$.description", is("Grocery shopping")))
+                .andExpect(jsonPath("$.amount", is(100)))
+                .andExpect(jsonPath("$.date", is("2023-06-30")));
     }
 
     @Test
     public void testUpdateExpense() throws Exception {
-        String updatedExpenseJson = "{\"description\": \"Updated Grocery shopping\", \"amount\": \"150.00\", \"date\": \"2023-07-01\"}";
+        String updatedExpenseJson = "{\"description\": \"Updated Grocery shopping\", \"amount\": \"150\", \"date\": \"2023-07-01\"}";
 
         mockMvc.perform(put("/expenses/update/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedExpenseJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is("Grocery shopping")));
+                .andExpect(jsonPath("$.description", is("Updated Grocery shopping")));
     }
 
     @Test

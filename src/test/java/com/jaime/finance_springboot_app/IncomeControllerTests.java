@@ -50,14 +50,22 @@ public class IncomeControllerTests {
     public void setUp() {
         User user = new User(1L, "John Doe", "john@example.com");
         Category category = new Category(1L, "Salary");
-        Income income1 = new Income(1L, "Salary for June", 5000, LocalDate.now(), user, category);
+        
+        Income income1 = new Income(1L, "Salary for June", 5000, LocalDate.of(2023, 06, 30), user, category);
         Income income2 = new Income(2L, "Freelance work", 2000, LocalDate.now(), user, category);
         incomeList = Arrays.asList(income1, income2);
 
         Mockito.when(incomeService.getAllIncomes()).thenReturn(incomeList);
         Mockito.when(incomeService.getIncomeById(1L)).thenReturn(income1);
+
+        // Mock para userService y categoryService
+        Mockito.when(userService.getUserById(1L)).thenReturn(user);
+        Mockito.when(categoryService.getCategoryByName("Salary")).thenReturn(category);
+
         Mockito.when(incomeService.createIncome(Mockito.any(Income.class))).thenReturn(income1);
-        Mockito.when(incomeService.updateIncome(Mockito.eq(1L), Mockito.any(Income.class))).thenReturn(income1);
+        
+        Income updatedIncome = new Income(1L, "Updated Salary", 6000, LocalDate.of(2023, 7, 1), user, category);
+        Mockito.when(incomeService.updateIncome(Mockito.eq(1L), Mockito.any(Income.class))).thenReturn(updatedIncome);
     }
 
     @Test
@@ -84,7 +92,9 @@ public class IncomeControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(newIncomeJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is("Salary for June")));
+                .andExpect(jsonPath("$.description", is("Salary for June")))
+                .andExpect(jsonPath("$.amount", is(5000)))
+                .andExpect(jsonPath("$.date", is("2023-06-30"))); // Verificar el campo de fecha en el formato correcto
     }
 
     @Test
@@ -95,7 +105,7 @@ public class IncomeControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedIncomeJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description", is("Salary for June")));
+                .andExpect(jsonPath("$.description", is("Updated Salary")));
     }
 
     @Test

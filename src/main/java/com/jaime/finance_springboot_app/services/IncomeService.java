@@ -1,11 +1,12 @@
 package com.jaime.finance_springboot_app.services;
 
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jaime.finance_springboot_app.models.Category;
 import com.jaime.finance_springboot_app.models.Income;
 import com.jaime.finance_springboot_app.repositories.IncomeRepository;
 
@@ -27,7 +28,7 @@ public class IncomeService {
         return incomeRepository.findById(id).orElse(null);
     }
 
-    public Income createIncome(Income income) {
+    public Income createIncome(Income income) { 
         return incomeRepository.save(income);
     }
 
@@ -36,6 +37,8 @@ public class IncomeService {
             income.setDescription(updatedIncome.getDescription());
             income.setAmount(updatedIncome.getAmount());
             income.setDate(updatedIncome.getDate());
+            income.setUser(updatedIncome.getUser());
+            income.setCategory(updatedIncome.getCategory());
             return incomeRepository.save(income);
         }).orElse(null);
     }
@@ -44,7 +47,7 @@ public class IncomeService {
         incomeRepository.deleteById(id);
     }
 
-    public List<Income> getIncomesByCategory(String category) {
+    public List<Income> getIncomesByCategory(Category category) {
         return incomeRepository.findByCategory(category);
     }
 

@@ -35,6 +35,9 @@ public class CategoryControllerTests {
 
     private List<Category> categoryList;
 
+
+
+    //"Servidor simulado" actua respondiendo a las llamadas del cliente
     @BeforeEach
     public void setUp() {
         Category category1 = new Category(1L, "Food");
@@ -48,6 +51,7 @@ public class CategoryControllerTests {
         Mockito.when(categoryService.updateCategory(Mockito.eq(1L), Mockito.any(Category.class))).thenReturn(category1);
     }
 
+    //"Cliente simulado" actua realizando llamadas al "servidor simulado"
     @Test
     public void testGetAllCategories() throws Exception {
         mockMvc.perform(get("/categories/all"))

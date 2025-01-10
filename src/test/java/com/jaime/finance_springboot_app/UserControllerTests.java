@@ -39,12 +39,13 @@ public class UserControllerTests {
     public void setUp() {
         User user1 = new User(1L, "John Doe", "john@example.com");
         User user2 = new User(2L, "Jane Doe", "jane@example.com");
+        User userUpdated = new User(1L, "John Smith", " john@example.com");
         userList = Arrays.asList(user1, user2);
 
         Mockito.when(userService.getAllUsers()).thenReturn(userList);
         Mockito.when(userService.getUserById(1L)).thenReturn(user1);
         Mockito.when(userService.createUser(Mockito.any(User.class))).thenReturn(user1);
-        Mockito.when(userService.updateUser(Mockito.eq(1L), Mockito.any(User.class))).thenReturn(user1);
+        Mockito.when(userService.updateUser(Mockito.eq(1L), Mockito.any(User.class))).thenReturn(userUpdated);
     }
 
     @Test
@@ -82,7 +83,7 @@ public class UserControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedUserJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("John Doe")));
+                .andExpect(jsonPath("$.name", is("John Smith")));
     }
 
     @Test
