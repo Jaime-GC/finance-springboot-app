@@ -46,7 +46,7 @@ public class ExpenseService {
             expense.setUser(updatedExpense.getUser());
             expense.setCategory(updatedExpense.getCategory());
             return expenseRepository.save(expense);
-        }).orElse(null);
+        }).orElseThrow(() -> new IllegalArgumentException("Expense with id " + id + " not found"));
     }
 
     public void deleteExpense(Long id) {

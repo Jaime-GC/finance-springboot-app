@@ -1,4 +1,4 @@
-package com.jaime.finance_springboot_app;
+package com.jaime.finance_springboot_app.controllers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jaime.finance_springboot_app.controllers.UserController;
 import com.jaime.finance_springboot_app.models.User;
 import com.jaime.finance_springboot_app.services.UserService;
 

@@ -1,4 +1,4 @@
-package com.jaime.finance_springboot_app;
+package com.jaime.finance_springboot_app.controllers;
 
 import java.time.LocalDate;
 import java.util.Arrays;

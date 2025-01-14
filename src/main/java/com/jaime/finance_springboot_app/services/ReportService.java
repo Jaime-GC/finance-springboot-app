@@ -85,14 +85,14 @@ public class ReportService {
 
         // Agrupar ingresos por mes
         for (Income income : allIncomes) {
-            String month = income.getDate().getMonth().toString();
+            String month = income.getDate().getMonth().toString().substring(0, 1).toUpperCase() + income.getDate().getMonth().toString().substring(1).toLowerCase();
             double currentAmount = incomesByMonth.getOrDefault(month, 0.0);
             incomesByMonth.put(month, currentAmount + income.getAmount());
         }
 
         // Agrupar gastos por mes
         for (Expense expense : allExpenses) {
-            String month = expense.getDate().getMonth().toString();
+            String month = expense.getDate().getMonth().toString().substring(0, 1).toUpperCase() + expense.getDate().getMonth().toString().substring(1).toLowerCase();
             double currentAmount = expensesByMonth.getOrDefault(month, 0.0);
             expensesByMonth.put(month, currentAmount + expense.getAmount());
         }
