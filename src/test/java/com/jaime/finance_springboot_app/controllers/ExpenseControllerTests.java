@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jaime.finance_springboot_app.controllers.ExpenseController;
 import com.jaime.finance_springboot_app.models.Category;
 import com.jaime.finance_springboot_app.models.Expense;
 import com.jaime.finance_springboot_app.models.User;
