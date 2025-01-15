@@ -9,6 +9,7 @@ public class FinanceSpringbootAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FinanceSpringbootAppApplication.class, args);
 		System.out.println("Aplicacion arrancada");
+		System.out.println("Se puede acceder a la documentacion de la API en http://localhost:8080/swagger-ui.html");
 	}
 
 }
