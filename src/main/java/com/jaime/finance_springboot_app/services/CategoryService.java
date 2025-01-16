@@ -23,7 +23,9 @@ public class CategoryService {
     }
 
     public Category getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
+        if (name == null) return null;        
+        Category category = categoryRepository.findByName(name);
+        return category;
     }
 
     public Category createCategory(Category category) {

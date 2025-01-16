@@ -18,14 +18,6 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        Schema reportSchema = new Schema<Report>()
-                .type("object")
-                .description("Modelo de reporte financiero")
-                .addProperty("id", new Schema<Long>().type("integer").description("ID único del reporte"))
-                .addProperty("totalIncomes", new Schema<Double>().type("number").description("Total de ingresos"))
-                .addProperty("totalExpenses", new Schema<Double>().type("number").description("Total de gastos"))
-                .addProperty("balance", new Schema<Double>().type("number").description("Balance final"));
-
         return new OpenAPI()
                 .info(new Info()
                     .title("Finance Springboot API")
@@ -35,8 +27,6 @@ public class SwaggerConfig {
                         .name("Jaime")
                         .url("https://github.com/Jaime-GC/finance-springboot-app"))
                     .license(new License()
-                        .name("MIT")))
-                .components(new Components()
-                    .addSchemas("Report", reportSchema));
+                        .name("MIT")));
     }
 }

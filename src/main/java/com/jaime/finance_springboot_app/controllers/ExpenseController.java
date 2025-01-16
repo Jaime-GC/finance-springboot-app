@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,6 +55,7 @@ public class ExpenseController {
     public ResponseEntity<Expense> createExpense(@PathVariable Long userId, @PathVariable String categoryName, @RequestBody Expense expense) {
         User userById = userService.getUserById(userId);
         Category categoryByName = categoryService.getCategoryByName(categoryName);
+        
         if (userById == null || categoryByName == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } else {
@@ -74,13 +76,18 @@ public class ExpenseController {
         expenseService.deleteExpense(id);
     }
 
-    @GetMapping("/category/{category}")
-    public List<Expense> getExpensesByCategory(@PathVariable Category category) {
-        return expenseService.getExpensesByCategory(category);
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<List<Expense>> getExpensesByCategory(@PathVariable String categoryName) {
+        Category category = categoryService.getCategoryByName(categoryName);
+        if (category == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        List<Expense> expenses = expenseService.getExpensesByCategory(category);
+        return ResponseEntity.ok(expenses);
     }
 
     @GetMapping("/date/{date}")
-    public List<Expense> getExpensesByDate(@PathVariable Date date) {
+    public List<Expense> getExpensesByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
         return expenseService.getExpensesByDate(date);
     }
 }

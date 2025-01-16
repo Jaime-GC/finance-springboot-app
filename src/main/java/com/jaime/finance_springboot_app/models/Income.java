@@ -27,6 +27,7 @@ public class Income {
 
     private String description;
     private int amount;
+    
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;
 

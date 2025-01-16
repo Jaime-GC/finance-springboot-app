@@ -2,10 +2,14 @@ package com.jaime.finance_springboot_app.controllers;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -66,6 +70,8 @@ public class ExpenseControllerTests {
         
         Expense updatedExpense = new Expense(1L, "Updated Grocery shopping", 150, LocalDate.of(2023, 7, 1), user, category);
         Mockito.when(expenseService.updateExpense(Mockito.eq(1L), Mockito.any(Expense.class))).thenReturn(updatedExpense);
+        // Mock for getCategoryByName("Food")
+        Mockito.when(categoryService.getCategoryByName("Food")).thenReturn(new Category(1L, "Food"));
     }
 
     @Test
@@ -84,6 +90,60 @@ public class ExpenseControllerTests {
                 .andExpect(jsonPath("$.description", is("Grocery shopping")));
     }
 
+
+    @Test
+    public void testGetExpensesByUserId() throws Exception {
+        User user = new User(1L, "John Doe", "john@example.com");
+        List<Expense> userExpenses = Arrays.asList(
+            new Expense(1L, "Grocery", 100, LocalDate.now(), user, new Category())
+        );
+        
+        when(expenseService.getExpensesByUserId(1L)).thenReturn(userExpenses);
+
+        mockMvc.perform(get("/expenses/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].description").value("Grocery"));
+    }
+
+    @Test
+    public void testGetExpensesByCategory() throws Exception {
+        Category category = new Category(1L, "Food");
+        List<Expense> categoryExpenses = Arrays.asList(
+            new Expense(1L, "Grocery", 100, LocalDate.now(), new User(), category)
+        );
+        
+        when(expenseService.getExpensesByCategory(any(Category.class))).thenReturn(categoryExpenses);
+
+        mockMvc.perform(get("/expenses/category/Food"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].description").value("Grocery"));
+    }
+
+    @Test
+    public void getExpensesByCategory_WhenCategoryNotFound_ShouldReturnNotFound() throws Exception {
+        when(categoryService.getCategoryByName("NonExistent")).thenReturn(null);
+
+        mockMvc.perform(get("/expenses/category/NonExistent"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetExpensesByDate() throws Exception {
+        Date date = new Date();
+        List<Expense> dateExpenses = Arrays.asList(
+            new Expense(1L, "Grocery", 100, LocalDate.now(), new User(), new Category())
+        );
+        
+        when(expenseService.getExpensesByDate(any(Date.class))).thenReturn(dateExpenses);
+
+        mockMvc.perform(get("/expenses/date/2024-03-15"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].description").value("Grocery"));
+    }
+
     @Test
     public void testCreateExpense() throws Exception {
         String newExpenseJson = "{\"description\": \"Grocery shopping\", \"amount\": \"100\", \"date\": \"2023-06-30\"}";
@@ -95,6 +155,16 @@ public class ExpenseControllerTests {
                 .andExpect(jsonPath("$.description", is("Grocery shopping")))
                 .andExpect(jsonPath("$.amount", is(100)))
                 .andExpect(jsonPath("$.date", is("2023-06-30")));
+    }
+
+    @Test
+    public void createExpense_WhenUserNotFound_ShouldReturnNotFound() throws Exception {
+        when(userService.getUserById(1L)).thenReturn(null);
+        
+        mockMvc.perform(post("/expenses/create/1/Food")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"amount\": 100.0, \"description\": \"test\"}"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

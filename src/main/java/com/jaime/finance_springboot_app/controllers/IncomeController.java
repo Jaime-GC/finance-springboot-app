@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,13 +51,18 @@ public class IncomeController {
         return incomeService.getIncomeById(id);
     }
 
-    @GetMapping("/category/{category}")
-    public List<Income> getIncomesByCategory(@PathVariable Category category) {
-        return incomeService.getIncomesByCategory(category);
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<List<Income>> getIncomesByCategory(@PathVariable String categoryName) {
+        Category category = categoryService.getCategoryByName(categoryName);
+        if (category == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        List<Income> incomes = incomeService.getIncomesByCategory(category);
+        return ResponseEntity.ok(incomes);
     }
 
     @GetMapping("/date/{date}")
-    public List<Income> getIncomesByDate(@PathVariable Date date) {
+    public List<Income> getIncomesByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date) {
         return incomeService.getIncomesByDate(date);
     }
 
@@ -65,7 +72,7 @@ public class IncomeController {
         Category categoryByName = categoryService.getCategoryByName(categoryName);
 
         if (userById == null || categoryByName == null) {
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } else {
             income.setUser(userById);
             income.setCategory(categoryByName);

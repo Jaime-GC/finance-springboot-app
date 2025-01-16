@@ -5,6 +5,10 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -89,5 +94,19 @@ public class UserControllerTests {
     public void testDeleteUser() throws Exception {
         mockMvc.perform(delete("/users/1"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteUser_WhenUserNotFound_ShouldReturnNotFoundMessage() throws Exception {
+        // Simular que el usuario no existe
+        when(userService.getUserById(1L)).thenReturn(null);
+
+        // Ejecutar DELETE request
+        mockMvc.perform(delete("/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("User not found"));
+
+        // Verificar que deleteUser nunca fue llamado
+        verify(userService, never()).deleteUser(1L);
     }
 }
