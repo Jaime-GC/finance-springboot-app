@@ -81,6 +81,23 @@ public class IncomeController {
         }
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<Income> createIncome(@RequestBody Income income) {
+        if (income.getUser() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } else {
+            // Verificar si la categoría existe, si no, crearla
+            Category category = categoryService.getCategoryByName(income.getCategory().getName());
+            if (category == null) {
+                category = categoryService.createCategory(income.getCategory());
+            }
+            income.setCategory(category);
+    
+            Income createdIncome = incomeService.createIncome(income);
+            return ResponseEntity.ok(createdIncome);
+        }
+    }    
+
     @PutMapping("/update/{id}")
     public Income updateIncome(@PathVariable Long id, @RequestBody Income income) {
         return incomeService.updateIncome(id, income);

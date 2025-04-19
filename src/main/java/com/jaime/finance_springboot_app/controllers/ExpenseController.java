@@ -66,6 +66,24 @@ public class ExpenseController {
         }
     }
 
+
+    @PostMapping("/create")
+    public ResponseEntity<Expense> createExpense(@RequestBody Expense expense) {
+        if (expense.getUser() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } else {
+            // Check if the category exists, if not, create it
+            Category category = categoryService.getCategoryByName(expense.getCategory().getName());
+            if (category == null) {
+                category = categoryService.createCategory(expense.getCategory());
+            }
+            expense.setCategory(category);
+            
+            Expense createdExpense = expenseService.createExpense(expense);
+            return ResponseEntity.ok(createdExpense);
+        }
+    }
+
     @PutMapping("/update/{id}")
         public Expense updateExpense(@PathVariable Long id, @RequestBody Expense expense) {
         return expenseService.updateExpense(id, expense);
