@@ -43,7 +43,9 @@ public class ExpenseService {
             expense.setDescription(updatedExpense.getDescription());
             expense.setAmount(updatedExpense.getAmount());
             expense.setDate(updatedExpense.getDate());
-            expense.setUser(updatedExpense.getUser());
+            if (updatedExpense.getUser() != null) {
+                expense.setUser(updatedExpense.getUser());
+            }
             expense.setCategory(updatedExpense.getCategory());
             return expenseRepository.save(expense);
         }).orElseThrow(() -> new IllegalArgumentException("Expense with id " + id + " not found"));

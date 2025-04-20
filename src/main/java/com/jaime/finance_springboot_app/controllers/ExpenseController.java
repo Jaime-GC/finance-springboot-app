@@ -69,7 +69,7 @@ public class ExpenseController {
 
     @PostMapping("/create")
     public ResponseEntity<Expense> createExpense(@RequestBody Expense expense) {
-        if (expense.getUser() == null) {
+        if (expense.getUser() == null || expense.getCategory() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } else {
             // Check if the category exists, if not, create it

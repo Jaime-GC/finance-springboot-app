@@ -37,7 +37,7 @@ public class UserController {
         return userService.createUser(user);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         if (userService.getUserById(id) == null ) {
             return "User not found";
@@ -47,7 +47,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
